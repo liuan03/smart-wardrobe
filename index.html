@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>智能穿搭 · ATELIER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+SC:wght@400;500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">A</span>
+    <span class="brand-name">智能穿搭<i>ATELIER</i></span>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="upload">存档</button>
+    <button class="tab" data-tab="closet">衣橱</button>
+    <button class="tab" data-tab="fitting">试衣间</button>
+  </nav>
+</header>
+
+<main>
+  <!-- 上传存档 -->
+  <section id="upload" class="panel active">
+    <div class="sec-head">
+      <span class="eyebrow">01 — ARCHIVE</span>
+      <h2>衣物存档</h2>
+      <p class="hint">上传你的衣服与裤子，按品类归档，构筑私人衣橱。数据仅存于本机浏览器。</p>
+    </div>
+    <form id="uploadForm" class="card">
+      <div class="row">
+        <label>品类</label>
+        <select id="upCategory" name="category">
+          <option value="top">上衣</option>
+          <option value="bottom">下衣</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>名称</label>
+        <input id="upName" type="text" placeholder="留空则用文件名" />
+      </div>
+      <div class="row">
+        <label>图片</label>
+        <input id="upFile" type="file" accept="image/*" multiple required />
+      </div>
+      <div id="upCount" class="msg"></div>
+      <button type="submit" class="btn primary">存入衣橱</button>
+      <span id="upMsg" class="msg"></span>
+    </form>
+  </section>
+
+  <!-- 衣橱库 -->
+  <section id="closet" class="panel">
+    <div class="sec-head">
+      <span class="eyebrow">02 — COLLECTION</span>
+      <h2>衣橱库</h2>
+      <p class="hint">按品类浏览你的单品，支持重命名、改分类、单件删除与批量管理。</p>
+    </div>
+    <div id="filters" class="filters"></div>
+    <div class="closet-bar">
+      <button id="selAll" class="btn ghost">全选</button>
+      <button id="delSel" class="btn danger" disabled>删除选中 (0)</button>
+      <span id="closetTip" class="msg"></span>
+    </div>
+    <div id="grid" class="grid"></div>
+  </section>
+
+  <!-- 试衣间 -->
+  <section id="fitting" class="panel">
+    <div class="sec-head">
+      <span class="eyebrow">03 — STYLING</span>
+      <h2>试衣间</h2>
+      <p class="hint">从衣橱选两件自定义排版，或让系统随机搭配一套。</p>
+    </div>
+    <div class="fit-controls">
+      <div class="mode">
+        <label><input type="radio" name="mode" value="vertical" checked /> <span>选定穿搭</span></label>
+        <label><input type="radio" name="mode" value="random" /> <span>随机穿搭</span></label>
+      </div>
+      <button id="genBtn" class="btn primary" disabled>穿搭生成</button>
+    </div>
+    <p id="fitHint" class="fit-hint"></p>
+
+    <div class="slots">
+      <div class="slot" data-slot="0"><span class="slot-tip">上衣框 · 点击下方任意「上衣」即可放入</span></div>
+      <div class="slot" data-slot="1"><span class="slot-tip">下衣框 · 点击下方任意「下衣」即可放入</span></div>
+    </div>
+
+    <h3>穿搭效果图</h3>
+    <div id="result" class="result empty">选好两件后点「穿搭生成」</div>
+
+    <h3>单品库</h3>
+    <div id="fitFilters" class="filters small"></div>
+    <div id="fitGrid" class="grid"></div>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
