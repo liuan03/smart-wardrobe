@@ -312,7 +312,7 @@ document.querySelectorAll('input[name="mode"]').forEach((r) =>
       ? "随机模式：系统会从衣橱自动挑一件上衣 + 一件下衣，排版同上下版式。"
       : "";
     document.getElementById("fitGrid").style.opacity = isRandom ? "0.35" : "1";
-    document.querySelector(".slots").style.opacity = isRandom ? "0.35" : "1";
+    document.querySelector(".slots").style.display = isRandom ? "none" : "flex";
     renderSlots();
   })
 );
