@@ -515,7 +515,7 @@ document.getElementById("favBtn").addEventListener("click", () => {
     date: new Date().toLocaleString("zh-CN"),
   });
   saveFavs(favs);
-  document.getElementById("favMsg").textContent = "⭐ 已收藏，去「收藏」页查看";
+  document.getElementById("favMsg").textContent = "已收藏，去「收藏」页查看";
   document.getElementById("favBtn").disabled = true;
 });
 
