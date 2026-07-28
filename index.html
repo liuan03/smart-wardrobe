@@ -19,6 +19,7 @@
     <button class="tab active" data-tab="upload">存档</button>
     <button class="tab" data-tab="closet">衣橱</button>
     <button class="tab" data-tab="fitting">试衣间</button>
+    <button class="tab" data-tab="favorites">收藏</button>
   </nav>
 </header>
 
@@ -91,10 +92,29 @@
 
     <h3>穿搭效果图</h3>
     <div id="result" class="result empty">选好两件后点「穿搭生成」</div>
+    <div class="result-actions">
+      <button id="favBtn" class="btn primary" disabled>收藏这套</button>
+      <span id="favMsg" class="msg"></span>
+    </div>
 
     <h3>单品库</h3>
     <div id="fitFilters" class="filters small"></div>
     <div id="fitGrid" class="grid"></div>
+  </section>
+
+  <!-- 收藏 -->
+  <section id="favorites" class="panel">
+    <div class="sec-head">
+      <span class="eyebrow">04 — FAVORITES</span>
+      <h2>我的收藏</h2>
+      <p class="hint">生成穿搭后点「收藏这套」即可留存，下面是过往收藏，支持批量管理。</p>
+    </div>
+    <div class="closet-bar">
+      <button id="favSelAll" class="btn ghost">全选</button>
+      <button id="favDelSel" class="btn danger" disabled>删除选中 (0)</button>
+      <span id="favTip" class="msg"></span>
+    </div>
+    <div id="favGrid" class="grid"></div>
   </section>
 </main>
 

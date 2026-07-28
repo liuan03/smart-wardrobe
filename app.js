@@ -9,6 +9,7 @@ const state = {
   fitItemsById: {},
   editingId: null,
   closetSel: new Set(),
+  favSel: new Set(),
 };
 
 // ---------- 衣橱数据（localStorage） ----------
@@ -34,6 +35,7 @@ document.querySelectorAll(".tab").forEach((t) => {
     document.getElementById(t.dataset.tab).classList.add("active");
     if (t.dataset.tab === "closet") loadCloset();
     if (t.dataset.tab === "fitting") loadFitGrid();
+    if (t.dataset.tab === "favorites") loadFavsUI();
   });
 });
 
@@ -470,12 +472,122 @@ document.getElementById("genBtn").addEventListener("click", async () => {
   result.className = "result";
   result.textContent = "生成中…";
   try {
-    const canvas = await compose(topItem, bottomItem, mode === "random" ? "随机穿搭" : "穿搭效果图");
+    const title = mode === "random" ? "随机穿搭" : "穿搭效果图";
+    const canvas = await compose(topItem, bottomItem, title);
+    lastCanvas = canvas;
+    lastMeta = {
+      title,
+      topName: topItem.name || "未命名",
+      bottomName: bottomItem.name || "未命名",
+      mode,
+    };
     result.innerHTML = `<img src="${canvas.toDataURL("image/png")}" alt="穿搭效果图" />`;
+    document.getElementById("favBtn").disabled = false;
+    document.getElementById("favMsg").textContent = "";
   } catch (e) {
     result.className = "result empty";
     result.textContent = "❌ 生成失败：" + (e && e.message ? e.message : e);
   }
+});
+
+// ---------- 收藏 ----------
+const FAV_KEY = "wardrobe.favorites.v1";
+function loadFavs() {
+  try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
+  catch (e) { return []; }
+}
+function saveFavs(f) {
+  localStorage.setItem(FAV_KEY, JSON.stringify(f));
+}
+let favs = loadFavs();
+let lastCanvas = null;
+let lastMeta = null;
+
+document.getElementById("favBtn").addEventListener("click", () => {
+  if (!lastCanvas) return;
+  favs.unshift({
+    id: genId(),
+    data: lastCanvas.toDataURL("image/jpeg", 0.9), // JPEG 省空间，避免收藏多了撑爆 localStorage
+    title: lastMeta.title,
+    topName: lastMeta.topName,
+    bottomName: lastMeta.bottomName,
+    mode: lastMeta.mode,
+    date: new Date().toLocaleString("zh-CN"),
+  });
+  saveFavs(favs);
+  document.getElementById("favMsg").textContent = "⭐ 已收藏，去「收藏」页查看";
+  document.getElementById("favBtn").disabled = true;
+});
+
+function loadFavsUI() {
+  const grid = document.getElementById("favGrid");
+  if (!favs.length) {
+    grid.innerHTML = `<p style="color:var(--muted)">还没有收藏，去「试衣间」生成穿搭后点「收藏这套」吧。</p>`;
+    updateFavBar();
+    return;
+  }
+  grid.innerHTML = favs
+    .map((f) => {
+      const sel = state.favSel.has(f.id) ? "sel" : "";
+      return `
+    <div class="item ${sel}" data-id="${f.id}">
+      <input type="checkbox" class="favbox" data-id="${f.id}" ${sel ? "checked" : ""} />
+      <button class="del" data-id="${f.id}" title="移除收藏">×</button>
+      <img src="${f.data}" alt="${f.title}" />
+      <div class="meta">
+        <span class="cat">${f.title || "穿搭"}</span>
+        <div class="nm">${f.topName || "未命名"} / ${f.bottomName || "未命名"}</div>
+        <div class="dt">${f.date || ""}</div>
+      </div>
+    </div>`;
+    })
+    .join("");
+  grid.querySelectorAll(".del").forEach((b) =>
+    b.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      if (!confirm("确定移除这条收藏？")) return;
+      favs = favs.filter((x) => x.id !== b.dataset.id);
+      saveFavs(favs);
+      state.favSel.delete(b.dataset.id);
+      loadFavsUI();
+    })
+  );
+  grid.querySelectorAll(".favbox").forEach((c) =>
+    c.addEventListener("change", () => {
+      c.checked ? state.favSel.add(c.dataset.id) : state.favSel.delete(c.dataset.id);
+      c.closest(".item").classList.toggle("sel", c.checked);
+      updateFavBar();
+    })
+  );
+  updateFavBar();
+}
+
+function updateFavBar() {
+  const n = state.favSel.size;
+  const delBtn = document.getElementById("favDelSel");
+  delBtn.textContent = `删除选中 (${n})`;
+  delBtn.disabled = n === 0;
+  document.getElementById("favTip").textContent = n ? "已选 " + n + " 件" : "";
+  const selAll = document.getElementById("favSelAll");
+  const allSelected = favs.length > 0 && favs.every((f) => state.favSel.has(f.id));
+  selAll.textContent = allSelected ? "取消全选" : "全选";
+}
+
+document.getElementById("favSelAll").addEventListener("click", () => {
+  const allSelected = favs.length > 0 && favs.every((f) => state.favSel.has(f.id));
+  if (allSelected) state.favSel.clear();
+  else favs.forEach((f) => state.favSel.add(f.id));
+  loadFavsUI();
+});
+
+document.getElementById("favDelSel").addEventListener("click", () => {
+  const n = state.favSel.size;
+  if (!n) return;
+  if (!confirm(`确定删除选中的 ${n} 条收藏？`)) return;
+  favs = favs.filter((x) => !state.favSel.has(x.id));
+  saveFavs(favs);
+  state.favSel.clear();
+  loadFavsUI();
 });
 
 // ---------- 初始化 ----------
